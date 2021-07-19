@@ -1,55 +1,15 @@
-import {
-  SchedulerLike,
-  queueScheduler,
-  asapScheduler,
-  asyncScheduler,
-  animationFrameScheduler,
-  fromEvent,
-  range
-} from 'rxjs';
+import { of, asyncScheduler } from 'rxjs';
+import { map, subscribeOn } from 'rxjs/operators';
 
-const initPosition = () => {
-  const blockElement = document.querySelector('#block') as HTMLElement;
-  blockElement.style.left = '100px';
-  blockElement.style.top = '100px';
-};
-
-const updatePositionByScheduler = (scheduler: SchedulerLike) => {
-  initPosition();
-
-  setTimeout(() => {
-    console.log('start');
-
-    range(0, 100, scheduler).subscribe({
-      next: val => {
-        const blockElement = document.querySelector('#block') as HTMLElement;
-        blockElement.style.left = 100 + val + 'px';
-        blockElement.style.top = 100 + val + 'px';
-      },
-      complete: () => console.log('complete')
-    });
-    console.log('end');
-  }, 300);
-};
-
-fromEvent(document.querySelector('#goNull'), 'click').subscribe(() => {
-  updatePositionByScheduler(null);
-});
-
-fromEvent(document.querySelector('#goQueue'), 'click').subscribe(() => {
-  updatePositionByScheduler(queueScheduler);
-});
-
-fromEvent(document.querySelector('#goAsap'), 'click').subscribe(() => {
-  updatePositionByScheduler(asapScheduler);
-});
-
-fromEvent(document.querySelector('#goAsync'), 'click').subscribe(() => {
-  updatePositionByScheduler(asyncScheduler);
-});
-
-fromEvent(document.querySelector('#goAnimationFrame'), 'click').subscribe(
-  () => {
-    updatePositionByScheduler(animationFrameScheduler);
-  }
-);
+/**
+ * 使用 observeOn 控制來源 Observable 事件發生時機
+ * 使用 subscribeOn 控制訂閱時收到事件資料時機
+ */
+console.log('start');
+of(1, 2)
+  .pipe(subscribeOn(asyncScheduler))
+  .subscribe({
+    next: result => console.log(result),
+    complete: () => console.log('complete')
+  });
+console.log('end');
