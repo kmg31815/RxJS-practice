@@ -1,13 +1,18 @@
-import { AsyncSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 
 /**
- * AsyncSubject
+ * asObservable()
  */
-// 只會將完成前"最後一次"事件發送給當下有訂閱的觀察者
-const source$ = new AsyncSubject();
-source$.subscribe(data => console.log(`第一次訂閱 : ${data}`));
-source$.next(1);
-source$.subscribe(data => console.log(`第二次訂閱 : ${data}`));
-source$.next(2);
-source$.complete();
-source$.subscribe(data => console.log(`第三次訂閱 : ${data}`));
+// Subject 本身可透過 next、error、complete 來改變 stream
+// Subject 本身就是一個 Observable
+
+const source$ = new Subject(); // Subject
+source$.subscribe(data => console.log('source ' + data));
+source$.next(1); // Subject next
+
+// Observable
+const observable$ = source$.asObservable(); // 表示回傳的型別是 Observable，代表使用他時不能用.next()傳值 => 避免 subject 直接暴露在外
+observable$.subscribe(data => console.log('observable ' + data)); // 不會印
+
+// observable$.next(2);
+// Error: observable$.next is not a function
