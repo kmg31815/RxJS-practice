@@ -1,14 +1,17 @@
-import { interval, fromEvent } from 'rxjs';
-import { map, startWith, takeUntil, endWith } from 'rxjs/operators';
+import { fromEvent, interval, from, of } from 'rxjs';
+import { find, max } from 'rxjs/operators';
 
-const ticker$ = interval(5000).pipe(map(() => 'tick'));
+// find() => 找到就停下來
+const clock$ = interval(5000).pipe(find(data => data % 3 === 2));
+clock$.subscribe({
+  next: data => {
+    console.log(data);
+  },
+  complete: () => console.log('done')
+});
 
-const documentClicks$ = fromEvent(document, 'click');
+const clock2$ = of(2, 3, 4, 5, 6).pipe(max());
+clock2$.subscribe(console.log);
 
-ticker$
-  .pipe(
-    startWith('interval started'),
-    takeUntil(documentClicks$), // 當監聽到 documentClicks$ 事件，endWith()
-    endWith('interval ended by click')
-  )
-  .subscribe(console.log);
+const clock3$ = from([2, 3, 4, 5, 6]).pipe(max());
+clock3$.subscribe(console.log);
