@@ -1,17 +1,20 @@
-import { fromEvent, interval, from, of } from 'rxjs';
-import { find, max } from 'rxjs/operators';
+import { OperatorFunction, Observable, fromEvent } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
 
-// find() => 找到就停下來
-const clock$ = interval(5000).pipe(find(data => data % 3 === 2));
-clock$.subscribe({
-  next: data => {
-    console.log(data);
-  },
-  complete: () => console.log('done')
-});
+var click$ = fromEvent(document, 'click');
+var subs = click$.pipe(DraculaOperator(300, 4)).subscribe(console.log);
 
-const clock2$ = of(2, 3, 4, 5, 6).pipe(max());
-clock2$.subscribe(console.log);
-
-const clock3$ = from([2, 3, 4, 5, 6]).pipe(max());
-clock3$.subscribe(console.log);
+// 自製 Operator
+function DraculaOperator(
+  minlength: number,
+  times: number
+): OperatorFunction<String, string> {
+  // OperatorFunction 介面
+  return function(source: Observable<string>) {
+    // 回傳 Observable
+    return source.pipe(
+      filter(input => input.clientX >= minlength),
+      take(times)
+    );
+  };
+}
