@@ -1,14 +1,13 @@
-import { ReplaySubject } from 'rxjs';
+import { AsyncSubject } from 'rxjs';
 
 /**
- * ReplaySubject(N)
+ * AsyncSubject
  */
-// 每當物件實體被訂閱時會重播最近 N 次事件資料
-const source$ = new ReplaySubject(3);
+// 只會將完成前"最後一次"事件發送給當下有訂閱的觀察者
+const source$ = new AsyncSubject();
 source$.subscribe(data => console.log(`第一次訂閱 : ${data}`));
-for (let i = 0; i < 5; ++i) {
-  source$.next(i);
-}
+source$.next(1);
 source$.subscribe(data => console.log(`第二次訂閱 : ${data}`));
-source$.complete(); // 就算資料流發生錯誤或完成，每次訂閱一樣會收到最近N次事件資料
+source$.next(2);
+source$.complete();
 source$.subscribe(data => console.log(`第三次訂閱 : ${data}`));
