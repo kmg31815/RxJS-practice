@@ -1,16 +1,15 @@
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
-/*
-  只有 Observer 與 Observable 的痛點：
-    兩個 observer 想要訂閱同一個 observable，但每次訂閱都會讓 observable 物件執行一次
-*/
-
-const source$ = new Subject();
-source$.subscribe(data => console.log(`A : ${data}`)); // 若只處理next狀態，可只傳第一個callback function
-source$.next(1); // 當事件/資料產生時，會去通知所有訂閱他的觀察者
+/**
+ * BehaviorSubject
+ */
+// 訂閱時會得到"最後一次"的事件資訊，因此，建立物件實體需要給予一個"初始值"，作為最近一次的事件值
+const source$ = new BehaviorSubject(0);
+source$.subscribe(data => console.log(`1 : ${data}`));
+source$.next(1);
+console.log('value >> ' + source$.value);
+source$.subscribe(data => console.log(`2 : ${data}`));
 source$.next(2);
-source$.subscribe(data => console.log(`B : ${data}`));
-source$.next(3);
-source$.next(4);
-source$.subscribe(data => console.log(`C : ${data}`));
 source$.complete();
+source$.subscribe(data => console.log(`3 : ${data}`));
+console.log('value >> ' + source$.value);
