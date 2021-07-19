@@ -1,20 +1,55 @@
-import { OperatorFunction, Observable, fromEvent } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
+import {
+  SchedulerLike,
+  queueScheduler,
+  asapScheduler,
+  asyncScheduler,
+  animationFrameScheduler,
+  fromEvent,
+  range
+} from 'rxjs';
 
-var click$ = fromEvent(document, 'click');
-var subs = click$.pipe(DraculaOperator(300, 4)).subscribe(console.log);
+const initPosition = () => {
+  const blockElement = document.querySelector('#block') as HTMLElement;
+  blockElement.style.left = '100px';
+  blockElement.style.top = '100px';
+};
 
-// 自製 Operator
-function DraculaOperator(
-  minlength: number,
-  times: number
-): OperatorFunction<String, string> {
-  // OperatorFunction 介面
-  return function(source: Observable<string>) {
-    // 回傳 Observable
-    return source.pipe(
-      filter(input => input.clientX >= minlength),
-      take(times)
-    );
-  };
-}
+const updatePositionByScheduler = (scheduler: SchedulerLike) => {
+  initPosition();
+
+  setTimeout(() => {
+    console.log('start');
+
+    range(0, 100, scheduler).subscribe({
+      next: val => {
+        const blockElement = document.querySelector('#block') as HTMLElement;
+        blockElement.style.left = 100 + val + 'px';
+        blockElement.style.top = 100 + val + 'px';
+      },
+      complete: () => console.log('complete')
+    });
+    console.log('end');
+  }, 300);
+};
+
+fromEvent(document.querySelector('#goNull'), 'click').subscribe(() => {
+  updatePositionByScheduler(null);
+});
+
+fromEvent(document.querySelector('#goQueue'), 'click').subscribe(() => {
+  updatePositionByScheduler(queueScheduler);
+});
+
+fromEvent(document.querySelector('#goAsap'), 'click').subscribe(() => {
+  updatePositionByScheduler(asapScheduler);
+});
+
+fromEvent(document.querySelector('#goAsync'), 'click').subscribe(() => {
+  updatePositionByScheduler(asyncScheduler);
+});
+
+fromEvent(document.querySelector('#goAnimationFrame'), 'click').subscribe(
+  () => {
+    updatePositionByScheduler(animationFrameScheduler);
+  }
+);
