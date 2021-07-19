@@ -1,27 +1,16 @@
-import { Observable } from 'rxjs';
+import { Subject } from 'rxjs';
 
-const source$ = new Observable(subscriber => {
-  console.log('stream head');
-  subscriber.next(1);
-  subscriber.next(2);
-  subscriber.next(3);
-  setTimeout(() => {
-    subscriber.next(4);
-    subscriber.complete();
-    console.log('stream foot');
-  }, 100);
-  subscriber.complete(console.log('subscriber complete'));
-});
+/*
+  只有 Observer 與 Observable 的痛點：
+    兩個 observer 想要訂閱同一個 observable，但每次訂閱都會讓 observable 物件執行一次
+*/
 
-/**
- * 非同步
- */
-// 每當訂閱發生，便執行callback function內的程式碼
-source$.subscribe({
-  next: data => console.log(`Observable1 : ${data}`),
-  complete: () => console.log('complete1')
-});
-source$.subscribe({
-  next: data => console.log(`Observable2 : ${data}`),
-  complete: () => console.log('complete2')
-});
+const source$ = new Subject();
+source$.subscribe(data => console.log(`A : ${data}`));
+source$.next(1);
+source$.next(2);
+source$.subscribe(data => console.log(`B : ${data}`));
+source$.next(3);
+source$.next(4);
+source$.subscribe(data => console.log(`C : ${data}`));
+source$.complete();
