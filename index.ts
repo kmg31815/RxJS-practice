@@ -6,8 +6,8 @@ import { Subject } from 'rxjs';
 */
 
 const source$ = new Subject();
-source$.subscribe(data => console.log(`A : ${data}`));
-source$.next(1);
+source$.subscribe(data => console.log(`A : ${data}`)); // 若只處理next狀態，可只傳第一個callback function
+source$.next(1); // 當來源stream有事件發生，事件傳遞就會給觀察者
 source$.next(2);
 source$.subscribe(data => console.log(`B : ${data}`));
 source$.next(3);
